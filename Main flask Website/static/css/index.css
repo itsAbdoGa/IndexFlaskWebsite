@@ -1,0 +1,57 @@
+/* styles.css */
+
+/* Customize Navbar Height */
+.navbar {
+    min-height: 80px; /* Change the height as needed */
+}
+
+/* Customize Navbar Background Color */
+.navbar {
+    background-color: #343a40; /* Change the color as needed */
+}
+
+/* Customize Navbar Brand (Logo) */
+
+.navbar-brand img {
+	height: 80px;
+	width: auto;
+}
+
+/* Customize Navbar Links */
+.navbar-nav .nav-link {
+    color: #B6BBC4; /* Change the color of the links */
+	font-size: 20pt;
+	margin-right: 20px;
+}
+
+/* Hover effect on Navbar Links */
+.navbar-nav .nav-link:hover {
+    color: #F0ECE5; /* Change the hover color as needed */
+}
+
+.contact-text {
+	margin-bottom: 60px;
+	font-size: x-large;
+}
+.card .btn-primary {
+	background-color: #343a40;
+	border-color: white;
+}
+
+.card .btn-primary:hover {
+	background-color:lightgray;
+	color: black;
+}
+.contact-icons i{
+	margin-bottom: 40px;
+}
+.contact-icons i:hover {
+    color: gray; /* Change the color on hover as needed */
+    transition: color 0.3s ease; /* Add a smooth transition effect */
+}
+
+a.icons-btn {
+	display: inline-block;
+	height: 20px;
+	width: auto;
+}
