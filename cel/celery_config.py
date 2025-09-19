@@ -3,7 +3,7 @@ from kombu import Queue
 import os
 
 # Redis configuration
-REDIS_URL = os.getenv('REDIS_URL', 'redis://red-d36qu2gdl3ps73aceovg:6379')
+REDIS_URL = "rediss://default:ARjgAAImcDI0ZjM3MjE0ODYwZjI0Mjk1YmM2OGE5MGQyNDNmMzU5NXAyNjM2OA@growing-rabbit-6368.upstash.io:6379"
 
 # Create Celery app
 celery_app = Celery('store_processor')
@@ -57,4 +57,5 @@ celery_app.conf.update(
     # Memory management
     worker_max_tasks_per_child=100,  # Restart workers after 100 tasks to prevent memory leaks
     worker_max_memory_per_child=200000,  # 200MB per worker
+
 )
