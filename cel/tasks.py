@@ -5,7 +5,7 @@ import pandas as pd
 import requests
 from celery import group, chain
 from celery.exceptions import Retry
-from celery_config import celery_app
+from cel.celery_config import celery_app
 from core.database import get_db_connection
 from utils import extract_number, log_message_with_store
 from processcon.process_config import PROCESS_CONFIGS
@@ -341,4 +341,5 @@ def get_job_status(job_id):
             result[field] = int(result[field])
     
     result['job_id'] = job_id
+
     return result
