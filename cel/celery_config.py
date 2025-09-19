@@ -8,17 +8,13 @@ REDIS_URL = os.environ.get(
     "redis://default:ARjgAAImcDI0ZjM3MjE0ODYwZjI0Mjk1YmM2OGE5MGQyNDNmMzU5NXAyNjM2OA@growing-rabbit-6368.upstash.io:6379"
 )
 
-# SSL settings for Upstash
-ssl_options = {
-    'ssl_cert_reqs': ssl.CERT_NONE  # skip cert verification for free tier
-}
 
 celery_app = Celery('store_processor')
 
 celery_app.conf.update(
     broker_url=REDIS_URL.replace("redis://", "rediss://"),  # Upstash requires SSL
     result_backend=REDIS_URL.replace("redis://", "rediss://"),
-    broker_use_ssl=ssl_options,
+    broker_use_ssl=[{'ssl_cert_reqs': ssl.CERT_NONE}],
     
     # Task routing - separate queues for each store
     task_routes={
@@ -65,6 +61,7 @@ celery_app.conf.update(
     worker_max_memory_per_child=200000,  # 200MB per worker
 
 )
+
 
 
 
