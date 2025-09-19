@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPC Max Price Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='max_prices.css') }}">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-tags me-3"></i>Price Management</h1>
+            <p>Manage UPC maximum prices and profiles</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="{{ url_for('main.index') }}" class="nav-btn">
+                <i class="fas fa-search"></i>
+                Item Search
+            </a>
+            <a href="{{ url_for('admin.admin') }}" class="nav-btn">
+                <i class="fas fa-cogs"></i>
+                Admin Panel
+            </a>
+            <a href="#" class="nav-btn current">
+                <i class="fas fa-tags"></i>
+                Price Management
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-card">
+            <!-- Profile Management -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <i class="fas fa-user-tag"></i>
+                    Profile Management
+                </div>
+                
+                <div class="active-profile">
+                    <span>Active Profile:</span>
+                    <span class="badge" id="activeProfileName">Default</span>
+                </div>
+                
+                <div class="profile-badges" id="profilesList">
+                    <!-- Loading skeleton for profiles -->
+                    <div class="skeleton skeleton-badge"></div>
+                    <div class="skeleton skeleton-badge"></div>
+                    <div class="skeleton skeleton-badge"></div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-plus"></i></span>
+                            <input type="text" id="newProfileInput" class="form-control" placeholder="Enter new profile name">
+                            <button onclick="createProfile()" class="btn btn-primary" id="createProfileBtn">Create Profile</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-copy"></i></span>
+                            <select id="copyFromProfile" class="form-select">
+                                <option value="">Copy from profile (optional)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSV Upload Section -->
+            <div class="mb-4">
+                <div class="section-header">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Upload Max Prices CSV
+                </div>
+                
+                <div class="file-upload" onclick="document.getElementById('csvFile').click()">
+                    <div class="file-upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-upload-text">
+                        <strong>Click to upload</strong> or drag and drop your CSV file here
+                        <br>
+                        <small class="text-muted">CSV with columns: UPC, PRICE, DESCRIPTION (optional), NET (optional), DEPARTMENT (optional), PRODUCTID, PROFILE (optional)</small>
+                    </div>
+                    <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                </div>
+
+                <div id="selectedFile" class="file-selected" style="display: none;">
+                    <i class="fas fa-file-csv"></i>
+                    <span id="selectedFileName"></span>
+                </div>
+
+                <button onclick="uploadCSV()" class="btn btn-primary w-100" id="uploadBtn">
+                    <i class="fas fa-upload me-2"></i>
+                    Upload CSV to Current Profile
+                </button>
+            </div>
+
+            <!-- Manual Entry Section -->
+            <div class="mb-4">
+                <div class="section-header">
+                    <i class="fas fa-keyboard"></i>
+                    Add/Edit Max Price
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                            <input type="text" id="upcInput" class="form-control" placeholder="Enter UPC">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                            <input type="number" id="priceInput" class="form-control" placeholder="Enter Max Price" step="0.01">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                            <input type="text" id="productInput" class="form-control" placeholder="Enter Product ID (Optional)">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-info-circle"></i></span>
+                            <input type="text" id="descInput" class="form-control" placeholder="Enter Description (Optional)">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-chart-line"></i></span>
+                            <input type="number" id="netInput" class="form-control" placeholder="Enter Net (Optional)" step="0.01">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-sitemap"></i></span>
+                            <input type="text" id="deptInput" class="form-control" placeholder="Enter Department (Optional)">
+                        </div>
+                    </div>
+                </div>
+                <button id="addButton" onclick="addMaxPrice()" class="btn btn-primary w-100">
+                    <i class="fas fa-save me-2"></i>Add/Update Max Price to Current Profile
+                </button>
+            </div>
+
+            <!-- Current Max Prices -->
+            <div>
+                <div class="section-header">
+                    <i class="fas fa-list"></i>
+                    Current Max Prices
+                </div>
+                
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search UPCs, descriptions, or departments..." onkeyup="filterTable()">
+                </div>
+                
+                <div class="table-container" id="tableContainer">
+                    <table class="table mb-0" id="maxPricesTable">
+                        <thead>
+                            <tr>
+                                <th>UPC</th>
+                                <th>Max Price</th>
+                                <th>Product ID</th>
+                                <th>Net</th>
+                                <th>Department</th>
+                                <th>Description</th>
+                                <th>Profile</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priceTableBody">
+                            <!-- Loading skeleton rows -->
+                            <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                            <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                            <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                            <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                            <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination-container" id="pagination">
+                    <!-- Pagination will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProfile = 'Default';
+        let profiles = [];
+        
+        // Load profiles and max prices when page loads
+        window.addEventListener('load', function() {
+            loadProfiles();
+            loadMaxPrices();
+        });
+        
+        // Display selected filename
+        document.getElementById("csvFile").addEventListener("change", function() {
+            var fileInput = document.getElementById("csvFile");
+            var fileNameDisplay = document.getElementById("selectedFileName");
+            var selectedFile = document.getElementById("selectedFile");
+            
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = fileInput.files[0].name;
+                selectedFile.style.display = "flex";
+            } else {
+                selectedFile.style.display = "none";
+            }
+        });
+        
+        function showProfilesLoading() {
+            const profilesList = document.getElementById("profilesList");
+            profilesList.innerHTML = `
+                <div class="skeleton skeleton-badge"></div>
+                <div class="skeleton skeleton-badge"></div>
+                <div class="skeleton skeleton-badge"></div>
+            `;
+        }
+        
+        function showTableLoading() {
+            const tableBody = document.getElementById("priceTableBody");
+            tableBody.innerHTML = `
+                <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+                <tr><td colspan="8"><div class="skeleton skeleton-row"></div></td></tr>
+            `;
+        }
+        
+        function showButtonLoading(buttonId, loadingText = 'Loading...') {
+            const btn = document.getElementById(buttonId);
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loading-spinner me-2"></div>${loadingText}`;
+            return () => {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            };
+        }
+        
+        function loadProfiles() {
+            showProfilesLoading();
+            
+            fetch("/get_profiles")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Profiles data:", data);
+                profiles = (Array.isArray(data) ? data : data.profiles || ['Default'])
+                .map(p => p === null ? "Default" : p);
+                if (!currentProfile) currentProfile = 'Default';
+                renderProfiles();
+                updateCopyFromSelect();
+            })
+            .catch(error => {
+                console.error("Error loading profiles:", error);
+                profiles = ['Default'];
+                if (!currentProfile) currentProfile = 'Default';
+                renderProfiles();
+            });
+        }
+        
+        function renderProfiles() {
+            const profilesList = document.getElementById("profilesList");
+            profilesList.innerHTML = "";
+            
+            profiles.forEach(profile => {
+                const badge = document.createElement("span");
+                badge.className = `profile-badge ${profile === currentProfile ? 'active' : ''}`;
+                badge.textContent = profile;
+                badge.onclick = () => switchProfile(profile);
+                
+                // Add delete button for non-default profiles
+                if (profile !== 'Default') {
+                    const deleteBtn = document.createElement("i");
+                    deleteBtn.className = "fas fa-times ms-2";
+                    deleteBtn.style.cursor = "pointer";
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteProfile(profile);
+                    };
+                    badge.appendChild(deleteBtn);
+                }
+                
+                profilesList.appendChild(badge);
+            });
+        }
+        
+        function updateCopyFromSelect() {
+            const select = document.getElementById("copyFromProfile");
+            select.innerHTML = '<option value="">Copy from profile (optional)</option>';
+            
+            profiles.forEach(profile => {
+                const option = document.createElement("option");
+                option.value = profile;
+                option.textContent = profile;
+                select.appendChild(option);
+            });
+        }
+        
+        function switchProfile(profileName) {
+            currentProfile = profileName;
+            document.getElementById("activeProfileName").textContent = profileName;
+            renderProfiles();
+            updateCopyFromSelect();
+            loadMaxPrices();
+        }
+        
+        function createProfile() {
+            const profileName = document.getElementById("newProfileInput").value.trim();
+            const copyFrom = document.getElementById("copyFromProfile").value;
+            
+            if (!profileName) {
+                alert("Please enter a profile name.");
+                return;
+            }
+            
+            if (profiles.includes(profileName)) {
+                alert("Profile already exists.");
+                return;
+            }
+            
+            const resetButton = showButtonLoading('createProfileBtn', 'Creating...');
+            
+            fetch("/manage_profile", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    action: "create",
+                    profile_name: profileName,
+                    copy_from: copyFrom || null
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                resetButton();
+                if (data.success) {
+                    document.getElementById("newProfileInput").value = "";
+                    document.getElementById("copyFromProfile").value = "";
+                    loadProfiles();
+                    switchProfile(profileName);
+                } else {
+                    alert("Failed to create profile: " + (data.message || "Unknown error"));
+                }
+            })
+            .catch(error => {
+                resetButton();
+                console.error("Error:", error);
+                alert("Failed to create profile: " + error.message);
+            });
+        }
+        
+        function deleteProfile(profileName) {
+            if (profileName === 'Default') {
+                alert("Cannot delete the Default profile.");
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete the profile "${profileName}" and all its max prices?`)) {
+                // Show loading on the specific profile badge
+                const badges = document.querySelectorAll('.profile-badge');
+                let targetBadge;
+                badges.forEach(badge => {
+                    if (badge.textContent.trim().replace('×', '').trim() === profileName) {
+                        targetBadge = badge;
+                        const originalContent = badge.innerHTML;
+                        badge.innerHTML = `<div class="loading-spinner loading-spinner-primary me-2"></div>Deleting...`;
+                        badge.style.pointerEvents = 'none';
+                    }
+                });
+                
+                fetch("/manage_profile", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        action: "delete",
+                        profile_name: profileName
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (currentProfile === profileName) {
+                            switchProfile('Default');
+                        }
+                        loadProfiles();
+                    } else {
+                        if (targetBadge) {
+                            targetBadge.style.pointerEvents = 'auto';
+                        }
+                        alert("Failed to delete profile: " + (data.message || "Unknown error"));
+                    }
+                })
+                .catch(error => {
+                    if (targetBadge) {
+                        targetBadge.style.pointerEvents = 'auto';
+                    }
+                    console.error("Error:", error);
+                    alert("Failed to delete profile: " + error.message);
+                });
+            }
+        }
+        
+        function uploadCSV() {
+            var fileInput = document.getElementById("csvFile");
+            if (!fileInput.files.length) {
+                alert("Please select a CSV file to upload.");
+                return;
+            }
+            
+            var file = fileInput.files[0];
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("profile", currentProfile);
+            
+            const resetButton = showButtonLoading('uploadBtn', 'Uploading...');
+            
+            fetch("/upload_max_prices", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                resetButton();
+                if (data.success) {
+                    loadMaxPrices(); // Refresh the table
+                    alert(`Successfully uploaded ${data.count || 0} records to profile "${currentProfile}".`);
+                    // Clear file selection
+                    fileInput.value = '';
+                    document.getElementById("selectedFile").style.display = "none";
+                } else {
+                    alert("Upload failed: " + (data.message || "Unknown error"));
+                }
+            })
+            .catch(error => {
+                resetButton();
+                console.error("Error:", error);
+                alert("Upload failed: " + error.message);
+            });
+        }
+        
+        function addMaxPrice() {
+            const upc = document.getElementById("upcInput").value.trim();
+            let price = document.getElementById("priceInput").value.trim();
+            const description = document.getElementById("descInput").value.trim();
+            let net = document.getElementById("netInput").value.trim();
+            const department = document.getElementById("deptInput").value.trim();
+            const productid = document.getElementById("productInput").value.trim();
+            
+            if (!upc || !price) {
+                alert("Please enter both UPC and Max Price.");
+                return;
+            }
+            
+            // Clean price if it has dollar signs or other currency symbols
+            price = price.replace(/[$£€]/g, '').trim();
+            if (net) {
+                net = net.replace(/[$£€]/g, '').trim();
+            }
+            
+            const resetButton = showButtonLoading('addButton', 'Saving...');
+            
+            fetch("/manage_max_price", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    upc: upc, 
+                    price: price, 
+                    description: description,
+                    net: net || null,
+                    department: department || null,
+                    productid: productid || null,
+                    profile: currentProfile,
+                    action: "add"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                resetButton();
+                if (data.success) {
+                    // Clear form
+                    document.getElementById("upcInput").value = "";
+                    document.getElementById("priceInput").value = "";
+                    document.getElementById("descInput").value = "";
+                    document.getElementById("netInput").value = "";
+                    document.getElementById("deptInput").value = "";
+                    document.getElementById("productInput").value = "";
+                    // Refresh table
+                    loadMaxPrices();
+                } else {
+                    alert("Failed to add max price: " + (data.message || "Unknown error"));
+                }
+            })
+            .catch(error => {
+                resetButton();
+                console.error("Error:", error);
+                alert("Failed to add max price: " + error.message);
+            });
+        }
+        
+        function deleteMaxPrice(upc, profile) {
+            if (confirm(`Are you sure you want to delete max price for UPC ${upc} in profile "${profile}"?`)) {
+                // Show loading overlay on table
+                showTableLoadingOverlay('Deleting...');
+                
+                fetch("/manage_max_price", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        upc: upc, 
+                        profile: profile,
+                        action: "delete" 
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    hideTableLoadingOverlay();
+                    if (data.success) {
+                        loadMaxPrices(); // Refresh the table
+                    } else {
+                        alert("Failed to delete max price: " + (data.message || "Unknown error"));
+                    }
+                })
+                .catch(error => {
+                    hideTableLoadingOverlay();
+                    console.error("Error:", error);
+                    alert("Failed to delete max price: " + error.message);
+                });
+            }
+        }
+        
+        function editMaxPrice(upc, currentPrice, currentProductId, currentDesc, currentNet, currentDept, profile) {
+            // Switch to the profile if different
+            if (profile !== currentProfile) {
+                switchProfile(profile);
+            }
+            
+            // Fill the form with current values
+            document.getElementById("upcInput").value = upc;
+            document.getElementById("priceInput").value = currentPrice;
+            document.getElementById("productInput").value = currentProductId || '';
+            document.getElementById("descInput").value = currentDesc || '';
+            document.getElementById("netInput").value = currentNet !== null && currentNet !== 'null' ? currentNet : '';
+            document.getElementById("deptInput").value = currentDept || '';
+            
+            // Scroll to the form
+            document.querySelector('.section-header').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function showTableLoadingOverlay(message = 'Loading...') {
+            const tableContainer = document.getElementById("tableContainer");
+            const existing = tableContainer.querySelector('.loading-overlay');
+            if (existing) return;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = `
+                <div class="loading-content">
+                    <div class="loading-spinner loading-spinner-lg loading-spinner-primary"></div>
+                    <div>${message}</div>
+                </div>
+            `;
+            tableContainer.appendChild(overlay);
+        }
+        
+        function hideTableLoadingOverlay() {
+            const tableContainer = document.getElementById("tableContainer");
+            const overlay = tableContainer.querySelector('.loading-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+        
+        function loadMaxPrices() {
+            showTableLoading();
+            
+            fetch(`/get_max_prices?profile=${encodeURIComponent(currentProfile)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById("priceTableBody");
+                    tableBody.innerHTML = ""; // Clear existing rows
+                    
+                    if (data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="8" class="text-center">No max prices found for this profile</td></tr>';
+                        return;
+                    }
+                    
+                    data.forEach(item => {
+                        const row = document.createElement("tr");
+                        const description = item.description ? item.description.replace(/'/g, "\\'") : '';
+                        const department = item.department ? item.department.replace(/'/g, "\\'") : '';
+                        const productid = item.productid ? item.productid.replace(/'/g, "\\'") : '';
+                        const profile = item.profile ? item.profile.replace(/'/g, "\\'") : 'Default';
+                        const netValue = item.net !== null ? Number(item.net).toFixed(2) : null;
+                        
+                        row.innerHTML = `
+                            <td>${item.upc}</td>
+                            <td><span class="badge bg-success">${item.max_price.toFixed(2)}</span></td>
+                            <td>${item.productid || ''}</td>
+                            <td>${netValue !== null ? netValue : ''}</td>
+                            <td>${item.department || ''}</td>
+                            <td>${item.description || ''}</td>
+                            <td><span class="badge bg-info">${item.profile || 'Default'}</span></td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editMaxPrice('${item.upc}', ${item.max_price}, '${productid}', '${description}', ${netValue !== null ? netValue : 'null'}, '${department}', '${profile}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteMaxPrice('${item.upc}', '${profile}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                    
+                    // Reset pagination after loading data
+                    setTimeout(() => displayTablePage(1), 100);
+                })
+                .catch(error => {
+                    console.error("Error loading max prices:", error);
+                    const tableBody = document.getElementById("priceTableBody");
+                    tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Failed to load max prices</td></tr>';
+                });
+        }
+        
+        
+        function filterTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById("maxPricesTable");
+            const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        
+            let visibleCount = 0;
+        
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName("td");
+                let rowText = "";
+                for (let j = 0; j < cells.length; j++) {
+                    rowText += (cells[j].textContent || cells[j].innerText).toUpperCase() + " ";
+                }
+        
+                if (rowText.indexOf(filter) > -1) {
+                    rows[i].style.display = ""; // keep
+                    rows[i].classList.remove("filtered-out");
+                    visibleCount++;
+                } else {
+                    rows[i].style.display = "none"; // hide
+                    rows[i].classList.add("filtered-out");
+                }
+            }
+        
+            // Reset pagination on filtered rows
+            displayTablePage(1);
+        }
+    </script>
+    
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 10; // change this if you want more/less per page
+    
+        function displayTablePage(page) {
+            const table = document.getElementById("maxPricesTable");
+            const allRows = Array.from(table.getElementsByTagName("tbody")[0].getElementsByTagName("tr"));
+        
+            // Only consider visible rows (not filtered out)
+            const rows = allRows.filter(row => !row.classList.contains("filtered-out"));
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+        
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+            currentPage = page;
+        
+            // Hide everything first
+            allRows.forEach(row => row.style.display = "none");
+        
+            // Show only the right page of visible rows
+            for (let i = (page - 1) * rowsPerPage; i < page * rowsPerPage && i < totalRows; i++) {
+                rows[i].style.display = "";
+            }
+        
+            renderPagination(totalPages);
+        }
+    
+        function renderPagination(totalPages) {
+            const pagination = document.getElementById("pagination");
+            pagination.innerHTML = "";
+        
+            if (totalPages <= 1) return;
+        
+            // Prev button
+            const prev = document.createElement("button");
+            prev.className = "btn btn-secondary mx-1";
+            prev.textContent = "Prev";
+            prev.disabled = currentPage === 1;
+            prev.onclick = () => displayTablePage(currentPage - 1);
+            pagination.appendChild(prev);
+        
+            const maxVisible = 5; // how many page buttons to show around current
+        
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = startPage + maxVisible - 1;
+        
+            if (endPage > totalPages) {
+                endPage = totalPages;
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+        
+            // Show first page if needed
+            if (startPage > 1) {
+                addPageButton(1);
+                if (startPage > 2) addEllipsis();
+            }
+        
+            // Show range of pages
+            for (let i = startPage; i <= endPage; i++) {
+                addPageButton(i);
+            }
+        
+            // Show last page if needed
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) addEllipsis();
+                addPageButton(totalPages);
+            }
+        
+            // Next button
+            const next = document.createElement("button");
+            next.className = "btn btn-secondary mx-1";
+            next.textContent = "Next";
+            next.disabled = currentPage === totalPages;
+            next.onclick = () => displayTablePage(currentPage + 1);
+            pagination.appendChild(next);
+        
+            // Helper functions
+            function addPageButton(page) {
+                const btn = document.createElement("button");
+                btn.className =
+                    "btn " +
+                    (page === currentPage ? "btn-primary" : "btn-outline-primary") +
+                    " mx-1";
+                btn.textContent = page;
+                btn.onclick = () => displayTablePage(page);
+                pagination.appendChild(btn);
+            }
+        
+            function addEllipsis() {
+                const span = document.createElement("span");
+                span.className = "mx-2";
+                span.textContent = "...";
+                pagination.appendChild(span);
+            }
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

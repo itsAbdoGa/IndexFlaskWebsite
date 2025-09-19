@@ -1,0 +1,509 @@
+:root {
+    --primary-color: #2563eb;
+    --primary-light: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --secondary-color: #64748b;
+    --success-color: #059669;
+    --warning-color: #d97706;
+    --danger-color: #dc2626;
+    --surface: #ffffff;
+    --surface-alt: #f8fafc;
+    --surface-hover: #f1f5f9;
+    --border: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --radius: 0.5rem;
+    --radius-lg: 0.75rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f8fafc;
+    background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+    background-size: 20px 20px;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-primary);
+}
+
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.header h1 {
+    color: var(--text-primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.content-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.section-header i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+/* Loading Animations */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 0.8s linear infinite;
+}
+
+.loading-spinner-lg {
+    width: 24px;
+    height: 24px;
+    border-width: 3px;
+}
+
+.loading-spinner-primary {
+    border-color: rgba(37, 99, 235, 0.3);
+    border-top-color: var(--primary-color);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(2px);
+    z-index: 10;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-row {
+    height: 45px;
+    margin-bottom: 1px;
+}
+
+.skeleton-badge {
+    display: inline-block;
+    height: 20px;
+    width: 60px;
+    margin: 2px;
+}
+
+/* Navigation Buttons */
+.nav-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.nav-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.5rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow);
+}
+
+.nav-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.nav-btn.current {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Profile Management */
+.profile-section {
+    background: var(--surface-alt);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+    position: relative;
+}
+
+.profile-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    min-height: 40px;
+}
+
+.profile-badge {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.profile-badge:hover {
+    border-color: var(--primary-color);
+    background: var(--surface-hover);
+}
+
+.profile-badge.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.profile-badge i {
+    color: var(--danger-color);
+    opacity: 0.7;
+    font-size: 0.875rem;
+}
+
+.profile-badge.active i {
+    color: white;
+}
+
+.active-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.active-profile .badge {
+    background: var(--primary-color);
+    color: white;
+    font-size: 0.875rem;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control, .form-select {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: var(--surface);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+.input-group-text {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+}
+
+/* File Upload */
+.file-upload {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    background: var(--surface-alt);
+    position: relative;
+}
+
+.file-upload:hover {
+    border-color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.file-upload-icon {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.file-upload-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.file-selected {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--radius);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-warning {
+    background: var(--warning-color);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Table */
+.table-container {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    position: relative;
+    min-height: 400px;
+}
+
+.table {
+    margin: 0;
+}
+
+.table thead {
+    background: var(--surface-alt);
+}
+
+.table thead th {
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.table tbody td {
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background: var(--surface-hover);
+}
+
+.table .badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.pagination-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.75rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.pagination-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary-color);
+}
+
+.pagination-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 1rem;
+    }
+
+    .content-card {
+        padding: 1.5rem;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .nav-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-badges {
+        flex-direction: column;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .section-header {
+        flex-wrap: wrap;
+    }
+}

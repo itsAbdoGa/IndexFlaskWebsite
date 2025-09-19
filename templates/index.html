@@ -1,98 +1,914 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{url_for('static',filename='css/index.css')}}"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Item Search</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --surface-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+        }
 
-    <title>{{title}}</title>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f8fafc;
+            background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .content-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .section-header i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-btn.current {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .store-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--surface);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .store-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.2s ease;
+        }
+
+        .store-card:hover:not(.disabled) {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .store-card:hover:not(.disabled)::before {
+            transform: scaleX(1);
+        }
+
+        .store-card.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .store-card.selected::before {
+            transform: scaleX(1);
+            background: white;
+        }
+
+        .store-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--surface-alt);
+        }
+
+        .store-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary-color);
+        }
+
+        .store-card.selected .store-icon {
+            color: white;
+        }
+
+        .store-card.disabled .store-icon {
+            color: var(--text-muted);
+        }
+
+        .store-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .store-status {
+            font-size: 0.875rem;
+            opacity: 0.7;
+        }
+
+        .store-card.selected .store-status {
+            opacity: 0.9;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .form-control, .form-select {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background: var(--surface);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface-alt);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+        }
+
+        .form-check-input {
+            margin: 0;
+        }
+
+        .form-check-label {
+            margin: 0;
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            border-radius: var(--radius);
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-outline-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            border-radius: var(--radius);
+            border: 1px solid;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-warning {
+            background: rgba(217, 119, 6, 0.1);
+            border-color: rgba(217, 119, 6, 0.2);
+            color: #92400e;
+        }
+
+        .alert-info {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.2);
+            color: #1e40af;
+        }
+
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .store-filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .store-selection-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .content-card {
+                padding: 1.5rem;
+            }
+
+            .store-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .store-filter-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-search me-3"></i>Store Item Search</h1>
+            <p>Find and export item information across multiple retailers</p>
+        </div>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg  navbar-custom sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="static/logo.png" alt=" Logo" height="30">
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="#" class="nav-btn current">
+                <i class="fas fa-search"></i>
+                Item Search
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#projects-section">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact-section">Contact</a>
-                    </li>
-                </ul>
-            </div>
+            <a href="{{ url_for('admin.admin') }}" class="nav-btn">
+                <i class="fas fa-cogs"></i>
+                Admin Panel
+            </a>
+            <a href="{{ url_for('max_prices.max_prices') }}" class="nav-btn">
+                <i class="fas fa-tags"></i>
+                Price Management
+            </a>
         </div>
-    </nav>
-    
-    <section id="projects-section" class="container mt-5">
-        <h1 class="text-center mb-4">Projects</h2>
-        <div class="row">
-           
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="static/notfound.jpg" class="card-img-top" alt="Project Image 1">
-                    <div class="card-body">
-                        <h5 class="card-title">Youtube downloader</h5>
-                        <p class="card-text">A simple project which grants you the ability download any video you want from Youtube,Use it wisely ;)</p>
-                        <a href="#" class="btn btn-primary">Learn More</a>
+
+        <!-- Main Content -->
+        <div class="content-card">
+            <!-- Search Form -->
+            <form method="POST" enctype="multipart/form-data" id="searchForm">
+                <!-- Store Filter (Optional) -->
+                <div class="form-group">
+                    <div class="store-filter-header">
+                        <div class="section-header">
+                            <i class="fas fa-store"></i>
+                            Store Filter (Optional)
+                        </div>
+                        <div class="store-selection-actions">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="selectAllStores">
+                                <i class="fas fa-check-square"></i>
+                                Select All
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearAllStores">
+                                <i class="fas fa-square"></i>
+                                Clear All
+                            </button>
+                        </div>
                     </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Leave empty to search all stores, or select specific stores to filter results
+                    </div>
+
+                    <div class="store-grid">
+                        <div class="store-card" data-store="ace">
+                            <div class="store-icon">
+                                <i class="fas fa-hammer"></i>
+                            </div>
+                            <div class="store-name">Ace Hardware</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="bestbuy">
+                            <div class="store-icon">
+                                <i class="fas fa-tv"></i>
+                            </div>
+                            <div class="store-name">Best Buy</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="bjs">
+                            <div class="store-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="store-name">Bjs</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="costco">
+                            <div class="store-icon">
+                                <i class="fas fa-shopping-basket"></i>
+                            </div>
+                            <div class="store-name">Costco</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="dollargeneral">
+                            <div class="store-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="store-name">Dollar General</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="gamestop">
+                            <div class="store-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="store-name">Gamestop</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="homedepot">
+                            <div class="store-icon">
+                                <i class="fas fa-toolbox"></i>
+                            </div>
+                            <div class="store-name">Home Depot</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="kohls">
+                            <div class="store-icon">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                            <div class="store-name">Kohl's</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="lowes">
+                            <div class="store-icon">
+                                <i class="fas fa-hard-hat"></i>
+                            </div>
+                            <div class="store-name">Lowe's</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="samsclub">
+                            <div class="store-icon">
+                                <i class="fas fa-warehouse"></i>
+                            </div>
+                            <div class="store-name">Sam's Club</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="sephora">
+                            <div class="store-icon">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <div class="store-name">Sephora</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="target">
+                            <div class="store-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <div class="store-name">Target</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                        <div class="store-card" data-store="walmart">
+                            <div class="store-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="store-name">Walmart</div>
+                            <div class="store-status">
+                                <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden inputs for selected stores -->
+                    <div id="storeInputs"></div>
                 </div>
-            </div>
+
+                <!-- Filters -->
+                <div class="section-header">
+                    <i class="fas fa-filter"></i>
+                    Search Filters
+                </div>
+
+                <div class="row mb-4">
+                    <!-- Deals filter -->
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="dealFilter" name="deal_filter">
+                            <label class="form-check-label" for="dealFilter">
+                                <i class="fas fa-percentage"></i>
+                                Show Only Deals (Items Below Max Price)
+                            </label>
+                        </div>
+                    </div>
             
-
+                    <!-- Zero Inventory filter -->
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="zeroInventoryFilter" name="remove_zero_inventory">
+                            <label class="form-check-label" for="zeroInventoryFilter">
+                                <i class="fas fa-trash-alt"></i>
+                                Remove Items With Zero Inventory
+                            </label>
+                        </div>
+                    </div>
             
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="static/notfound.jpg" class="card-img-top" alt="Project Image 2">
-                    <div class="card-body">
-                        <h5 class="card-title">URL shortner</h5>
-                        <p class="card-text">Tired of long links? well with this project you can make those links a lot shorter! try it out.</p>
-                        <a href="#" class="btn btn-primary">Learn More</a>
+                    <!-- CSV Upload filter -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="storeIdsCsv" class="form-label">
+                                <i class="fas fa-file-csv"></i>
+                                Optional: Include a CSV file of Store IDs for further filtering (one column with a header)
+                            </label>
+                            <input class="form-control" type="file" id="storeIdsCsv" name="store_ids_csv" accept=".csv">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="static/notfound.jpg" class="card-img-top" alt="Project Image 3">
-                    <div class="card-body">
-                        <h5 class="card-title">Chat website</h5>
-                        <p class="card-text">Wanna look cool? use this chat website with your friends and talk whatever you want whoever you want to talk to  without concerns of privacy,shhh keep it a secret!</p>
-                        <a href="#" class="btn btn-primary">Learn More</a>
+                <!-- Profile Selection -->
+                <div class="form-group">
+                    <label for="profileSelect" class="form-label">
+                        <i class="fas fa-user-tag"></i>
+                        Select Profile
+                    </label>
+                    <select class="form-select" id="profileSelect" name="profile">
+                        <option value="">
+                            <span class="loading">
+                                <span class="spinner"></span>
+                                Loading profiles...
+                            </span>
+                        </option>
+                    </select>
+                    <div class="form-text">
+                        <i class="fas fa-info-circle me-1"></i>Choose a saved profile configuration
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Contact Section -->
-    <section id="contact-section" class="container mt-5">
-        <h1 class="text-center mb-4">Contact</h2>
-        <p class="text-center contact-text">Feel free to reach out to me through the following channels:</p>
-        <div class="d-flex justify-content-center contact-icons">
-            <a class="icons-btn" href="mailto:itsgacemabderrazak@.com"><i class="fas fa-envelope fa-3x mx-3"></i> </a>
-            <a class="icons-btn" href="https://twitter.com/GacemAbderazzak"> <i class="fab fa-twitter fa-3x mx-3"></i> </a>
-            <a class="icons-btn" href="https://www.instagram.com/abdrzk.gxm/"> <i class="fab fa-brands fa-instagram fa-3x mx-3"></i></a>
-            <a class="icons-btn" href="https://facebook.com/profile.php?id=100075933545735"><i class=" fab fa-brands fa-facebook fa-3x mx-3"></i></a>
+                <!-- Search Parameters -->
+                <div class="section-header">
+                    <i class="fas fa-search"></i>
+                    Search Parameters
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="upcInput" class="form-label">
+                                <i class="fas fa-barcode"></i>
+                                UPC
+                            </label>
+                            <input type="text" class="form-control" id="upcInput" name="upc" placeholder="Enter UPC/SKU" value="{{ request.form.get('upc', '') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-3" id="stateContainer" style="display: none;">
+                        <div class="form-group">
+                            <label for="stateSelect" class="form-label">
+                                <i class="fas fa-map"></i>
+                                State
+                            </label>
+                            <select class="form-select" id="stateSelect" name="state" disabled>
+                                <option value="">
+                                    <span class="loading">
+                                        <span class="spinner"></span>
+                                        Loading states...
+                                    </span>
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3" id="cityContainer" style="display: none;">
+                        <div class="form-group">
+                            <label for="citySelect" class="form-label">
+                                <i class="fas fa-city"></i>
+                                City
+                            </label>
+                            <select class="form-select" id="citySelect" name="city" disabled>
+                                <option value="">Select City</option>
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>Select a state first
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="priceInput" class="form-label">
+                                <i class="fas fa-dollar-sign"></i>
+                                Max Price
+                            </label>
+                            <input type="text" class="form-control" id="priceInput" name="price" placeholder="Enter price" value="{{ request.form.get('price', '') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" id="searchBtn">
+                    <i class="fas fa-file-export me-2"></i>
+                    <span id="searchBtnText">Export Results</span>
+                </button>
+            </form>
         </div>
-    </section>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script>
+        let selectedStores = new Set();
 
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            setupEventListeners();
+            loadProfiles();
+            updateStoreInputs();
+        }
+
+        function setupEventListeners() {
+            // Store selection
+            document.querySelectorAll('.store-card:not(.disabled)').forEach(card => {
+                card.addEventListener('click', function() {
+                    const store = this.dataset.store;
+                    toggleStore(store);
+                });
+            });
+
+            // Select all stores button
+            document.getElementById('selectAllStores').addEventListener('click', function() {
+                document.querySelectorAll('.store-card:not(.disabled)').forEach(card => {
+                    const store = card.dataset.store;
+                    selectedStores.add(store);
+                    card.classList.add('selected');
+                });
+                updateStoreInputs();
+                updateLocationFields();
+            });
+
+            // Clear all stores button
+            document.getElementById('clearAllStores').addEventListener('click', function() {
+                selectedStores.clear();
+                document.querySelectorAll('.store-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                updateStoreInputs();
+                hideLocationFields();
+            });
+
+            // State selection
+            document.getElementById('stateSelect').addEventListener('change', function() {
+                const state = this.value;
+                const citySelect = document.getElementById('citySelect');
+                
+                citySelect.innerHTML = '<option value="">Select City</option>';
+                citySelect.disabled = true;
+                
+                if (state && selectedStores.size > 0) {
+                    loadCities(state, selectedStores);
+                }
+            });
+
+            // Form submission - no validation needed since stores are optional
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                // Form can be submitted without any stores selected
+                return true;
+            });
+        }
+
+        function toggleStore(store) {
+            const card = document.querySelector(`[data-store="${store}"]`);
+            
+            if (selectedStores.has(store)) {
+                selectedStores.delete(store);
+                card.classList.remove('selected');
+            } else {
+                selectedStores.add(store);
+                card.classList.add('selected');
+            }
+            
+            updateStoreInputs();
+            updateLocationFields();
+        }
+
+        function updateStoreInputs() {
+            const container = document.getElementById('storeInputs');
+            container.innerHTML = '';
+            
+            selectedStores.forEach(store => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'stores';
+                input.value = store;
+                container.appendChild(input);
+            });
+        }
+
+        function updateLocationFields() {
+            if (selectedStores.size > 0) {
+                document.getElementById('stateContainer').style.display = 'block';
+                document.getElementById('cityContainer').style.display = 'block';
+                
+                // Load states for the first selected store (or you could merge states from all selected stores)
+                loadStates(selectedStores);
+            } else {
+                hideLocationFields();
+            }
+        }
+
+        function hideLocationFields() {
+            document.getElementById('stateContainer').style.display = 'none';
+            document.getElementById('cityContainer').style.display = 'none';
+        }
+
+        function loadProfiles() {
+            const profileSelect = document.getElementById('profileSelect');
+            
+            fetch('/get_profiles')
+                .then(response => response.json())
+                .then(data => {
+                    profileSelect.innerHTML = '<option value="">Select Profile</option>';
+                    
+                    const profiles = Array.isArray(data) ? data : (data.profiles || ['Default']);
+                    profiles.forEach(profile => {
+                        const option = document.createElement('option');
+                        option.value = profile || 'Default';
+                        option.textContent = profile || 'Default';
+                        profileSelect.appendChild(option);
+                    });
+
+                    // Restore previous selection
+                    const previousProfile = "{{ request.form.get('profile', '') }}";
+                    if (previousProfile) {
+                        profileSelect.value = previousProfile;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading profiles:', error);
+                    profileSelect.innerHTML = '<option value="">Error loading profiles</option>';
+                });
+        }
+
+        function loadStates(stores) {
+            const stateSelect = document.getElementById('stateSelect');
+        
+            stateSelect.innerHTML = '<option value=""><span class="loading"><span class="spinner"></span> Loading...</span></option>';
+            stateSelect.disabled = true;
+        
+            // build query string with multiple "stores" keys
+            const params = new URLSearchParams();
+            stores.forEach(store => params.append("stores", store));
+        
+            fetch(`/get_states?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    stateSelect.innerHTML = '<option value="">Select State</option>';
+                    data.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state;
+                        option.textContent = state;
+                        stateSelect.appendChild(option);
+                    });
+                    stateSelect.disabled = false;
+        
+                    // Restore previous selection
+                    const previousState = "{{ request.form.get('state', '') }}";
+                    if (previousState) {
+                        stateSelect.value = previousState;
+                        stateSelect.dispatchEvent(new Event('change'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading states:', error);
+                    stateSelect.innerHTML = '<option value="">Error loading states</option>';
+                    stateSelect.disabled = false;
+                });
+        }
+
+        function loadCities(state, stores) {
+            const citySelect = document.getElementById('citySelect');
+        
+            citySelect.innerHTML = '<option value=""><span class="loading"><span class="spinner"></span> Loading...</span></option>';
+            citySelect.disabled = true;
+        
+            // build query string with multiple "stores" keys
+            const params = new URLSearchParams();
+            params.append("state", state);
+            stores.forEach(store => params.append("stores", store));
+        
+            fetch(`/get_cities?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city;
+                        option.textContent = city;
+                        citySelect.appendChild(option);
+                    });
+                    citySelect.disabled = false;
+        
+                    // Restore previous selection
+                    const previousCity = "{{ request.form.get('city', '') }}";
+                    if (previousCity) {
+                        citySelect.value = previousCity;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading cities:', error);
+                    citySelect.innerHTML = '<option value="">Error loading cities</option>';
+                    citySelect.disabled = false;
+                });
+        }
+        
+    </script>
+</body>
 </html>

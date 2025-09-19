@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-cogs me-3"></i>Admin Panel</h1>
+            <p>Manage inventory uploads and system operations</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="{{ url_for('main.index') }}" class="nav-btn">
+                <i class="fas fa-search"></i>
+                Item Search
+            </a>
+            <a href="#" class="nav-btn current">
+                <i class="fas fa-cogs"></i>
+                Admin Panel
+            </a>
+            <a href="{{ url_for('max_prices.max_prices') }}" class="nav-btn">
+                <i class="fas fa-tags"></i>
+                Price Management
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-card">
+            <!-- Store Selection -->
+            <div class="form-group">
+                <div class="section-header">
+                    <i class="fas fa-store"></i>
+                    Select Store for Operations
+                </div>
+                <div class="store-grid">
+                    <div class="store-card" data-store="ace">
+                        <div class="store-icon">
+                            <i class="fas fa-hammer"></i>
+                        </div>
+                        <div class="store-name">Ace Hardware</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="bestbuy">
+                        <div class="store-icon">
+                            <i class="fas fa-tv"></i>
+                        </div>
+                        <div class="store-name">Best Buy</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="bjs">
+                        <div class="store-icon">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="store-name">Bjs</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="costco">
+                        <div class="store-icon">
+                            <i class="fas fa-shopping-basket"></i>
+                        </div>
+                        <div class="store-name">Costco</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="dollargeneral">
+                        <div class="store-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="store-name">Dollar General</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="gamestop">
+                        <div class="store-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="store-name">Gamestop</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="homedepot">
+                        <div class="store-icon">
+                            <i class="fas fa-toolbox"></i>
+                        </div>
+                        <div class="store-name">Home Depot</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="kohls">
+                        <div class="store-icon">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <div class="store-name">Kohl's</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="lowes">
+                        <div class="store-icon">
+                            <i class="fas fa-hard-hat"></i>
+                        </div>
+                        <div class="store-name">Lowe's</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="samsclub">
+                        <div class="store-icon">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <div class="store-name">Sam's Club</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="sephora">
+                        <div class="store-icon">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <div class="store-name">Sephora</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="target">
+                        <div class="store-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="store-name">Target</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="store-card" data-store="walmart">
+                        <div class="store-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="store-name">Walmart</div>
+                        <div class="store-status">
+                            <i class="fas fa-check-circle me-1"></i><span class="status-text">Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="storeAlert" class="alert alert-warning" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                Please select a store before proceeding with operations
+            </div>
+
+            <!-- CSV Upload Section -->
+            <div class="mb-4">
+                <div class="section-header">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    CSV Upload
+                </div>
+                
+                <div class="file-upload" id="fileUpload">
+                    <div class="file-upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-upload-text">
+                        <strong>Click to upload</strong> or drag and drop your CSV file here
+                        <br>
+                        <small class="text-muted">Supports CSV and Excel files</small>
+                    </div>
+                    <input type="file" id="csvFileInput" accept=".csv,.xlsx" style="display: none;">
+                </div>
+
+                <div id="selectedFile" class="file-selected" style="display: none;">
+                    <div>
+                        <i class="fas fa-file-csv me-2"></i>
+                        <span id="selectedFileName"></span>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="removeFile()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <button class="btn btn-primary w-100" id="uploadBtn" disabled>
+                    <i class="fas fa-upload me-2"></i>
+                    <span id="uploadBtnText">Upload File</span>
+                </button>
+            </div>
+
+            <!-- Enhanced Manual Entry Section with Widesearch -->
+            <div class="mb-4">
+                <div class="section-header">
+                    <i class="fas fa-keyboard"></i>
+                    Manual Entry with Widesearch
+                </div>
+                
+                <!-- UPC Input -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text">
+                        <i class="fas fa-barcode"></i>
+                    </span>
+                    <input type="text" class="form-control" id="manualUPC" placeholder="Enter UPC/SKU">
+                </div>
+
+                <!-- Search Type Toggle -->
+                <div class="search-type-toggle">
+                    <button type="button" class="search-type-btn active" data-type="single">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        Single ZIP
+                    </button>
+                    <button type="button" class="search-type-btn" data-type="wide">
+                        <i class="fas fa-map me-1"></i>
+                        Wide Search
+                    </button>
+                </div>
+
+                <!-- Single ZIP Input -->
+                <div id="singleZipSection" class="single-zip-input">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">
+                            <i class="fas fa-location-dot"></i>
+                        </span>
+                        <input type="text" class="form-control" id="manualZIP" placeholder="Enter ZIP Code">
+                    </div>
+                </div>
+
+                <!-- ZIP Codes CSV Upload -->
+                <div id="wideSearchSection">
+                    <div class="zip-file-upload" id="zipFileUpload">
+                        <div class="zip-file-upload-icon">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <div class="zip-file-upload-text">
+                            <strong>Upload ZIP codes CSV</strong> for wide search
+                            <br>
+                            <small class="text-muted">CSV should contain a 'zip' or 'zipcode' column</small>
+                        </div>
+                        <input type="file" id="zipFileInput" accept=".csv,.xlsx" style="display: none;">
+                    </div>
+
+                    <div id="zipFileSelected" class="zip-file-selected">
+                        <div>
+                            <i class="fas fa-file-csv me-2 text-success"></i>
+                            <span id="zipFileName"></span>
+                        </div>
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="removeZipFile()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary w-100 mt-3" id="manualSubmitBtn">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    <span id="manualBtnText">Submit Entry</span>
+                </button>
+            </div>
+
+            <!-- Database Maintenance -->
+            <div class="mb-4">
+                <div class="section-header">
+                    <i class="fas fa-database"></i>
+                    Database Maintenance
+                </div>
+                
+                <div class="input-group mb-3">
+                    <span class="input-group-text">
+                        <i class="fas fa-calendar-days"></i>
+                    </span>
+                    <input type="number" class="form-control" id="daysThreshold" placeholder="Days" min="1" value="30">
+                    <button class="btn btn-danger" onclick="confirmClearOldItems()">
+                        <i class="fas fa-trash-alt me-2"></i>
+                        Clear Old Items
+                    </button>
+                </div>
+            </div>
+
+            <!-- System Logs -->
+            <div>
+                <div class="section-header">
+                    <i class="fas fa-terminal"></i>
+                    System Logs - <span class="selected-store-name">No Store Selected</span>
+                    <div class="ms-auto d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="clearLogs()">
+                            <i class="fas fa-eraser me-1"></i>
+                            Clear
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" id="cancelUploadBtn">
+                            <i class="fas fa-stop me-1"></i>
+                            Cancel Upload
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="logs-container" id="logsContainer">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[System]</span> Admin panel ready for operations...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                        Confirm Action
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmModalBody">
+                    <!-- Confirmation message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var socket = io({
+            transports: ["websocket","polling"]
+        });
+        
+        let uploadAbortController = null;
+        let selectedStore = null;
+        let searchType = 'single'; // 'single' or 'wide'
+        let activeJobs = {}; // Track active jobs by store
+        
+        // Store-specific log storage (max 10 logs per store)
+        let storeLogs = {
+            walmart: [],
+            samsclub: [],
+            homedepot: [],
+            lowes: [],
+            target: [],
+            ace: [],
+            bestbuy: [],
+            bjs: [],
+            dollargeneral: [],
+            kohls: [],
+            sephora: [],
+            costco: [],
+            gamestop: []
+        };
+        const MAX_LOGS_PER_STORE = 10;
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            // Start status polling every 5 seconds
+            setInterval(pollStoreStatus, 5000);
+        });
+
+        function initializeApp() {
+            // Load saved store selection
+            const savedStore = localStorage.getItem('selectedStore');
+            if (savedStore) {
+                selectStore(savedStore);
+            }
+
+            // Load saved form values
+            document.getElementById('manualUPC').value = localStorage.getItem('upc') || '';
+            document.getElementById('manualZIP').value = localStorage.getItem('zip') || '';
+
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Store selection
+            document.querySelectorAll('.store-card:not(.disabled)').forEach(card => {
+                card.addEventListener('click', function() {
+                    const store = this.dataset.store;
+                    selectStore(store);
+                });
+            });
+
+            // File upload
+            document.getElementById('fileUpload').addEventListener('click', function() {
+                document.getElementById('csvFileInput').click();
+            });
+
+            document.getElementById('csvFileInput').addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    showSelectedFile(this.files[0].name);
+                }
+            });
+
+            // ZIP file upload for wide search
+            document.getElementById('zipFileUpload').addEventListener('click', function() {
+                document.getElementById('zipFileInput').click();
+            });
+
+            document.getElementById('zipFileInput').addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    showSelectedZipFile(this.files[0].name);
+                }
+            });
+
+            // Search type toggle
+            document.querySelectorAll('.search-type-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.dataset.type;
+                    setSearchType(type);
+                });
+            });
+
+            // Manual entry form
+            document.getElementById('manualUPC').addEventListener('input', function() {
+                localStorage.setItem('upc', this.value);
+            });
+
+            document.getElementById('manualZIP').addEventListener('input', function() {
+                localStorage.setItem('zip', this.value);
+            });
+
+            // Upload button
+            document.getElementById('uploadBtn').addEventListener('click', uploadCSV);
+
+            // Manual submit button
+            document.getElementById('manualSubmitBtn').addEventListener('click', submitManualEntry);
+
+            // Cancel upload button
+            document.getElementById('cancelUploadBtn').addEventListener('click', cancelUpload);
+        }
+
+        function pollStoreStatus() {
+            // Poll all stores status
+            fetch('/all_stores_status')
+            .then(response => response.json())
+            .then(data => {
+                updateStoreCards(data);
+            })
+            .catch(error => {
+                console.error('Error polling store status:', error);
+            });
+
+            // Poll individual job status if we have active jobs
+            Object.keys(activeJobs).forEach(jobId => {
+                fetch(`/job_status/${jobId}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateJobStatus(jobId, data);
+                })
+                .catch(error => {
+                    console.error(`Error polling job ${jobId}:`, error);
+                    // Remove job from tracking if it errors repeatedly
+                    delete activeJobs[jobId];
+                });
+            });
+        }
+
+        function updateJobStatus(jobId, data) {
+            const job = activeJobs[jobId];
+            if (!job) return;
+
+            if (data.status === 'completed' || data.status === 'failed' || data.status === 'cancelled') {
+                // Job finished, remove from tracking
+                delete activeJobs[jobId];
+                
+                if (data.status === 'completed') {
+                    addLogEntry(`Job ${jobId} completed: ${data.processed || 0} processed, ${data.failed || 0} failed`, job.store);
+                } else if (data.status === 'failed') {
+                    addLogEntry(`Job ${jobId} failed: ${data.error || 'Unknown error'}`, job.store);
+                } else {
+                    addLogEntry(`Job ${jobId} was cancelled`, job.store);
+                }
+            } else if (data.status === 'processing') {
+                // Update progress if available
+                if (data.total_rows && data.processed !== undefined) {
+                    const progress = Math.round((data.processed / data.total_rows) * 100);
+                    addLogEntry(`Job ${jobId} progress: ${progress}% (${data.processed}/${data.total_rows})`, job.store);
+                }
+            }
+        }
+
+        function setSearchType(type) {
+            searchType = type;
+            
+            // Update toggle buttons
+            document.querySelectorAll('.search-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+            
+            // Show/hide appropriate sections
+            const singleSection = document.getElementById('singleZipSection');
+            const wideSection = document.getElementById('wideSearchSection');
+            const zipUpload = document.getElementById('zipFileUpload');
+            
+            if (type === 'single') {
+                singleSection.classList.remove('hidden');
+                zipUpload.classList.remove('active');
+            } else {
+                singleSection.classList.add('hidden');
+                zipUpload.classList.add('active');
+            }
+            
+            // Update button text
+            const submitBtn = document.getElementById('manualBtnText');
+            if (type === 'single') {
+                submitBtn.textContent = 'Submit Entry';
+            } else {
+                submitBtn.textContent = 'Submit Wide Search';
+            }
+        }
+
+        function updateStoreCards(storesData) {
+            Object.keys(storesData).forEach(storeName => {
+                const storeCard = document.querySelector(`[data-store="${storeName}"]`);
+                if (storeCard) {
+                    const storeData = storesData[storeName];
+                    const statusElement = storeCard.querySelector('.status-text');
+                    const statusIcon = storeCard.querySelector('.store-status i');
+
+                    // Update status based on Celery data
+                    if (storeData.csv_processing) {
+                        statusElement.textContent = 'Processing CSV';
+                        statusIcon.className = 'fas fa-spinner fa-spin me-1';
+                        storeCard.classList.add('processing');
+                    } else if (storeData.active_tasks > 0) {
+                        statusElement.textContent = `Active (${storeData.active_tasks} tasks)`;
+                        statusIcon.className = 'fas fa-play me-1';
+                        storeCard.classList.add('active');
+                        storeCard.classList.remove('processing');
+                    } else if (storeData.queue_size > 0) {
+                        statusElement.textContent = `Queued (${storeData.queue_size})`;
+                        statusIcon.className = 'fas fa-clock me-1';
+                        storeCard.classList.remove('processing', 'active');
+                    } else if (storeData.worker_active) {
+                        statusElement.textContent = 'Ready';
+                        statusIcon.className = 'fas fa-check-circle me-1';
+                        storeCard.classList.remove('processing', 'active');
+                    } else {
+                        statusElement.textContent = 'Idle';
+                        statusIcon.className = 'fas fa-pause-circle me-1';
+                        storeCard.classList.remove('processing', 'active');
+                    }
+                }
+            });
+        }
+
+        function selectStore(store) {
+            selectedStore = store;
+            
+            // Update visual selection
+            document.querySelectorAll('.store-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-store="${store}"]`).classList.add('selected');
+            
+            document.getElementById('storeAlert').style.display = 'none';
+            
+            // Update store name displays
+            document.querySelectorAll('.selected-store-name').forEach(el => {
+                el.textContent = store.charAt(0).toUpperCase() + store.slice(1);
+            });
+            
+            // Save selection
+            localStorage.setItem('selectedStore', store);
+            
+            // Load store-specific logs
+            loadStoreSpecificLogs(store);
+        }
+
+        function loadStoreSpecificLogs(store) {
+            const logsContainer = document.getElementById('logsContainer');
+            logsContainer.innerHTML = '';
+            
+            const logs = storeLogs[store] || [];
+            logs.forEach(logData => {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `<span class="log-timestamp">[${logData.timestamp}]</span> ${logData.message}`;
+                logsContainer.appendChild(logEntry);
+            });
+            
+            if (logs.length === 0) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `<span class="log-timestamp">[System]</span> ${store.charAt(0).toUpperCase() + store.slice(1)} operations ready...`;
+                logsContainer.appendChild(logEntry);
+            }
+            
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function saveLogToStore(store, timestamp, message) {
+            if (!storeLogs[store]) {
+                storeLogs[store] = [];
+            }
+            
+            storeLogs[store].push({
+                timestamp: timestamp,
+                message: message
+            });
+            
+            if (storeLogs[store].length > MAX_LOGS_PER_STORE) {
+                storeLogs[store] = storeLogs[store].slice(-MAX_LOGS_PER_STORE);
+            }
+        }
+
+        function showSelectedFile(fileName) {
+            document.getElementById('selectedFileName').textContent = fileName;
+            document.getElementById('selectedFile').style.display = 'flex';
+            document.getElementById('uploadBtn').disabled = false;
+        }
+
+        function removeFile() {
+            document.getElementById('csvFileInput').value = '';
+            document.getElementById('selectedFile').style.display = 'none';
+            document.getElementById('uploadBtn').disabled = true;
+        }
+
+        function showSelectedZipFile(fileName) {
+            document.getElementById('zipFileName').textContent = fileName;
+            document.getElementById('zipFileSelected').classList.add('active');
+        }
+
+        function removeZipFile() {
+            document.getElementById('zipFileInput').value = '';
+            document.getElementById('zipFileSelected').classList.remove('active');
+        }
+
+        function uploadCSV() {
+            if (!selectedStore) {
+                document.getElementById('storeAlert').style.display = 'block';
+                return;
+            }
+
+            const fileInput = document.getElementById('csvFileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadBtnText = document.getElementById('uploadBtnText');
+
+            if (!fileInput.files.length) {
+                alert('Please select a file to upload.');
+                return;
+            }
+
+            uploadAbortController = new AbortController();
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('store', selectedStore);
+
+            // Show loading state
+            uploadBtn.disabled = true;
+            uploadBtnText.innerHTML = '<span class="loading"><span class="spinner"></span> Uploading...</span>';
+
+            fetch('/upload_csv', {
+                method: 'POST',
+                body: formData,
+                signal: uploadAbortController.signal
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`Server returned ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                // Reset form
+                fileInput.value = '';
+                removeFile();
+                uploadBtnText.textContent = 'Upload File';
+                
+                // Track job if provided
+                if (data.job_id) {
+                    activeJobs[data.job_id] = { store: selectedStore, type: 'csv' };
+                    addLogEntry(`CSV upload started - Job ID: ${data.job_id}, Queue size: ${data.queue_size || 0}`);
+                } else {
+                    addLogEntry(`Upload completed successfully for ${selectedStore}. Active tasks: ${data.active_tasks || 0}`);
+                }
+            })
+            .catch(error => {
+                if (error.name !== 'AbortError') {
+                    console.error('Error:', error);
+                    addLogEntry('Upload failed: ' + error.message);
+                }
+                uploadBtn.disabled = false;
+                uploadBtnText.textContent = 'Upload File';
+            });
+        }
+
+        function submitManualEntry() {
+            if (!selectedStore) {
+                document.getElementById('storeAlert').style.display = 'block';
+                return;
+            }
+
+            const upc = document.getElementById('manualUPC').value.trim();
+            const submitBtn = document.getElementById('manualSubmitBtn');
+            const submitBtnText = document.getElementById('manualBtnText');
+
+            if (!upc) {
+                alert('Please enter a UPC/SKU.');
+                return;
+            }
+
+            let requestData = {
+                upc: upc,
+                store: selectedStore,
+                search_type: searchType
+            };
+
+            if (searchType === 'single') {
+                const zip = document.getElementById('manualZIP').value.trim();
+                if (!zip) {
+                    alert('Please enter a ZIP code.');
+                    return;
+                }
+                requestData.zip = zip;
+            } else {
+                // Wide search - check if ZIP file is uploaded
+                const zipFileInput = document.getElementById('zipFileInput');
+                if (!zipFileInput.files.length) {
+                    alert('Please upload a ZIP codes CSV file for wide search.');
+                    return;
+                }
+                
+                // Create FormData for file upload
+                const formData = new FormData();
+                formData.append('upc', upc);
+                formData.append('store', selectedStore);
+                formData.append('search_type', searchType);
+                formData.append('zip_file', zipFileInput.files[0]);
+
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtnText.innerHTML = '<span class="loading"><span class="spinner"></span> Processing Wide Search...</span>';
+
+                fetch('/manual_input', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Track job if provided
+                    if (data.job_id) {
+                        activeJobs[data.job_id] = { store: selectedStore, type: 'wide_search' };
+                        addLogEntry(`Wide search initiated - Job ID: ${data.job_id} for UPC ${upc}`);
+                    } else if (data.task_id) {
+                        addLogEntry(`Wide search task created - Task ID: ${data.task_id} for UPC ${upc}`);
+                    } else {
+                        addLogEntry(`Wide search initiated for ${selectedStore}: UPC ${upc}`);
+                    }
+                    
+                    // Clear form on success
+                    document.getElementById('manualUPC').value = '';
+                    removeZipFile();
+                    localStorage.removeItem('upc');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    addLogEntry('Wide search failed: ' + error.message);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtnText.textContent = 'Submit Wide Search';
+                });
+                
+                return; // Exit early for wide search
+            }
+
+            // Single ZIP search
+            submitBtn.disabled = true;
+            submitBtnText.innerHTML = '<span class="loading"><span class="spinner"></span> Processing...</span>';
+
+            fetch('/manual_input', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Track task if provided
+                if (data.task_id) {
+                    addLogEntry(`Manual entry submitted - Task ID: ${data.task_id} for UPC ${upc}, ZIP ${requestData.zip}`);
+                } else {
+                    addLogEntry(`Manual entry submitted for UPC ${upc}, ZIP ${requestData.zip}`);
+                }
+                
+                // Clear form on success
+                document.getElementById('manualUPC').value = '';
+                document.getElementById('manualZIP').value = '';
+                localStorage.removeItem('upc');
+                localStorage.removeItem('zip');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addLogEntry('Manual entry failed: ' + error.message);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtnText.textContent = 'Submit Entry';
+            });
+        }
+
+        function confirmClearOldItems() {
+            const days = document.getElementById('daysThreshold').value;
+            if (!days || days <= 0) {
+                alert('Please enter a valid number of days.');
+                return;
+            }
+
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            let modalBody = `<p>Are you sure you want to delete all items older than <strong>${days} days</strong>?</p>`;
+            
+            if (selectedStore) {
+                modalBody += `<p>This will affect items for store: <strong>${selectedStore}</strong></p>`;
+            } else {
+                modalBody += `<p>This will affect items for <strong>all stores</strong></p>`;
+            }
+            
+            modalBody += `<p class="text-danger"><strong>This action cannot be undone!</strong></p>`;
+            
+            document.getElementById('confirmModalBody').innerHTML = modalBody;
+            
+            document.getElementById('confirmActionBtn').onclick = () => {
+                clearOldItems(days);
+                confirmModal.hide();
+            };
+            
+            confirmModal.show();
+        }
+
+        function clearOldItems(days) {
+            const requestData = { days: parseInt(days) };
+            if (selectedStore) {
+                requestData.store = selectedStore;
+            }
+
+            fetch('/clear_old_items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                addLogEntry(data.message || 'Old items cleared successfully');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addLogEntry('Failed to clear old items: ' + error.message);
+            });
+        }
+
+        function cancelUpload() {
+            if (uploadAbortController) {
+                uploadAbortController.abort();
+                addLogEntry('Upload cancelled by user');
+            }
+            
+            const requestData = {};
+            if (selectedStore) {
+                requestData.store = selectedStore;
+            }
+            
+            // Cancel any active jobs for this store
+            Object.keys(activeJobs).forEach(jobId => {
+                const job = activeJobs[jobId];
+                if (!selectedStore || job.store === selectedStore) {
+                    fetch('/cancel_upload', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ job_id: jobId, store: job.store })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        addLogEntry(`Cancelled job ${jobId}`, job.store);
+                        delete activeJobs[jobId];
+                    })
+                    .catch(error => {
+                        console.error('Error cancelling job:', error);
+                    });
+                }
+            });
+            
+            // Also send general cancel request
+            fetch('/cancel_upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                addLogEntry(`Cancelled ${data.jobs_cancelled || 0} jobs`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addLogEntry('Failed to cancel upload: ' + error.message);
+            });
+        }
+
+        function clearLogs() {
+            if (selectedStore) {
+                // Clear logs for current store
+                storeLogs[selectedStore] = [];
+                
+                // Clear display and show default message
+                const logsContainer = document.getElementById('logsContainer');
+                logsContainer.innerHTML = '';
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `<span class="log-timestamp">[System]</span> ${selectedStore.charAt(0).toUpperCase() + selectedStore.slice(1)} logs cleared...`;
+                logsContainer.appendChild(logEntry);
+            }
+        }
+
+        function addLogEntry(message, store = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const targetStore = store || selectedStore;
+            
+            // Save to store-specific storage
+            if (targetStore) {
+                saveLogToStore(targetStore, timestamp, message);
+            }
+            
+            // Only display if it's for the currently selected store
+            if (targetStore === selectedStore) {
+                const logsContainer = document.getElementById('logsContainer');
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
+                logsContainer.appendChild(logEntry);
+                logsContainer.scrollTop = logsContainer.scrollHeight;
+            }
+        }
+
+        // Socket.io event handlers
+        socket.on('log_update', function(data) {
+            let message, store = null;
+            
+            if (typeof data === 'string') {
+                message = data;
+            } else {
+                message = data.message;
+                store = data.store;
+            }
+            
+            addLogEntry(message, store);
+        });
+
+        socket.on('store_status_update', function(data) {
+            if (data.stores) {
+                updateStoreCards(data.stores);
+            }
+            
+            // Update system overview if provided
+            if (data.system) {
+                document.getElementById('totalStores').textContent = data.system.total_stores;
+                document.getElementById('activeStores').textContent = data.system.active_stores;
+                document.getElementById('totalQueueItems').textContent = data.system.total_queue_items;
+                document.getElementById('csvProcessingCount').textContent = data.system.csv_processing_count;
+            }
+        });
+</script>
+</body>
+</html>
