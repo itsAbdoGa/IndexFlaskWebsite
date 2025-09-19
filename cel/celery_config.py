@@ -3,16 +3,22 @@ from kombu import Queue
 import os
 import ssl
 # Redis configuration
-REDIS_URL = "redis://default:ARjgAAImcDI0ZjM3MjE0ODYwZjI0Mjk1YmM2OGE5MGQyNDNmMzU5NXAyNjM2OA@growing-rabbit-6368.upstash.io:6379"
+REDIS_URL = os.environ.get(
+    "REDIS_URL",
+    "redis://default:ARjgAAImcDI0ZjM3MjE0ODYwZjI0Mjk1YmM2OGE5MGQyNDNmMzU5NXAyNjM2OA@growing-rabbit-6368.upstash.io:6379"
+)
 
-# Create Celery app
+# SSL settings for Upstash
+ssl_options = {
+    'ssl_cert_reqs': ssl.CERT_NONE  # skip cert verification for free tier
+}
+
 celery_app = Celery('store_processor')
 
-# Celery configuration
 celery_app.conf.update(
-    # Broker and result backend
-    broker_url=REDIS_URL,
-    result_backend=REDIS_URL,
+    broker_url=REDIS_URL.replace("redis://", "rediss://"),  # Upstash requires SSL
+    result_backend=REDIS_URL.replace("redis://", "rediss://"),
+    broker_use_ssl=ssl_options,
     
     # Task routing - separate queues for each store
     task_routes={
@@ -59,6 +65,7 @@ celery_app.conf.update(
     worker_max_memory_per_child=200000,  # 200MB per worker
 
 )
+
 
 
 
