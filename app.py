@@ -22,6 +22,3 @@ app.register_blueprint(max_prices.bp)
 
 
 start_processing_worker()
-
-if __name__ == "__main__":
-    socketio.run(app, debug=True)
