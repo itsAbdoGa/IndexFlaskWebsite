@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: flask-web
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --worker-class gevent -w 1 app:app
+
+  - type: worker
+    name: celery-worker
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A celery_config worker --loglevel=info --concurrency=4
