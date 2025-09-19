@@ -1,7 +1,7 @@
 from celery import Celery
 from kombu import Queue
 import os
-
+import ssl
 # Redis configuration
 REDIS_URL = "rediss://default:ARjgAAImcDI0ZjM3MjE0ODYwZjI0Mjk1YmM2OGE5MGQyNDNmMzU5NXAyNjM2OA@growing-rabbit-6368.upstash.io:6379"
 ssl_options = {
@@ -62,4 +62,5 @@ celery_app.conf.update(
     worker_max_memory_per_child=200000,  # 200MB per worker
 
 )
+
 
