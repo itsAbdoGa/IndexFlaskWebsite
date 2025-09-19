@@ -4,7 +4,9 @@ import os
 
 # Redis configuration
 REDIS_URL = "rediss://default:ARjgAAImcDI0ZjM3MjE0ODYwZjI0Mjk1YmM2OGE5MGQyNDNmMzU5NXAyNjM2OA@growing-rabbit-6368.upstash.io:6379"
-
+ssl_options = {
+    'ssl_cert_reqs': ssl.CERT_NONE  # or CERT_REQUIRED if you have proper certs
+}
 # Create Celery app
 celery_app = Celery('store_processor')
 
@@ -13,6 +15,7 @@ celery_app.conf.update(
     # Broker and result backend
     broker_url=REDIS_URL,
     result_backend=REDIS_URL,
+    broker_use_ssl=ssl_options,
     
     # Task routing - separate queues for each store
     task_routes={
@@ -59,3 +62,4 @@ celery_app.conf.update(
     worker_max_memory_per_child=200000,  # 200MB per worker
 
 )
+
