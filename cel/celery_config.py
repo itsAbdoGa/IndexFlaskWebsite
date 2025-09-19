@@ -5,16 +5,15 @@ import ssl
 # Redis configuration
 REDIS_URL = os.environ.get(
     "REDIS_URL",
-    "redis://default:ARjgAAImcDI0ZjM3MjE0ODYwZjI0Mjk1YmM2OGE5MGQyNDNmMzU5NXAyNjM2OA@growing-rabbit-6368.upstash.io:6379"
+    "rediss://default:ARjgAAImcDI0ZjM3MjE0ODYwZjI0Mjk1YmM2OGE5MGQyNDNmMzU5NXAyNjM2OA@growing-rabbit-6368.upstash.io:6379/0?ssl_cert_reqs=CERT_NONE"
 )
 
 
 celery_app = Celery('store_processor')
 
 celery_app.conf.update(
-    broker_url=REDIS_URL.replace("redis://", "rediss://"),  # Upstash requires SSL
-    result_backend=REDIS_URL.replace("redis://", "rediss://"),
-    broker_use_ssl=[{'ssl_cert_reqs': ssl.CERT_NONE}],
+    broker_url=REDIS_URL,
+    result_backend=REDIS_URL,
     
     # Task routing - separate queues for each store
     task_routes={
@@ -61,6 +60,7 @@ celery_app.conf.update(
     worker_max_memory_per_child=200000,  # 200MB per worker
 
 )
+
 
 
 
